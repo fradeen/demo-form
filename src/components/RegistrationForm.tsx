@@ -59,6 +59,7 @@ export const RegistrationForm = () => {
         dispatch(addToList(formInput))
         setCountryinput('')
         reset()
+        setFirstStepCompleted(false)
 
     }
 
