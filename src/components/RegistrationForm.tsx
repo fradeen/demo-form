@@ -27,7 +27,7 @@ const personalDetailsSchema = object().shape({
         if (!govIDType)
             return schema.notRequired()
         if (govIDType === 'aadhar')
-            return string().min(12, 'Aadhar card must be of 12 numeric characters').max(12, 'Aadhar card must be of 12 numeric characters').matches(/^[2-9][0-9]+$/, 'Aadhar card number must not start from 0 or 1').required()
+            return string().matches(/^[2-9][0-9]+$/, 'Aadhar card number must not start from 0 or 1').min(12, 'Aadhar card must be of 12 numeric characters').max(12, 'Aadhar card must be of 12 numeric characters').required()
         else if (govIDType === 'pan')
             return string().min(10, 'Pan card must be of 10 alphanumeric characters').max(10, 'Pan card must be of 10 alphanumeric characters').required()
         else return schema.notRequired()
@@ -47,7 +47,7 @@ const personalDetailsSchema = object().shape({
 export type personalDetails = InferType<typeof personalDetailsSchema>
 
 export const RegistrationForm = () => {
-    const { register, handleSubmit, formState: { errors }, reset, trigger } = useForm<personalDetails>({ resolver: yupResolver(personalDetailsSchema) })
+    const { register, handleSubmit, formState: { errors }, reset, trigger } = useForm<personalDetails>({ resolver: yupResolver(personalDetailsSchema), mode: "onChange" })
     const [countryList, setCountryList] = useState<string[]>([])
     const [countryInput, setCountryinput] = useState('')
     const [isFirstStepCompleted, setFirstStepCompleted] = useState<boolean>()
@@ -91,8 +91,8 @@ export const RegistrationForm = () => {
     return (
         <>
             <CssBaseline />
-            <Container component="main" maxWidth='md' sx={{ display: "flex", flexDirection: "column" }}>
-                <Container maxWidth='xs'>
+            <Container component="main" maxWidth='xl' sx={{ display: "flex", flexDirection: "column" }}>
+                <Container maxWidth='xs' sx={{ flex: 1 }}>
                     <Box
                         sx={{
                             marginTop: 8,
@@ -194,42 +194,44 @@ export const RegistrationForm = () => {
                         </Box>
                     </Box>
                 </Container>
-                <Box sx={{ flex: 1 }}>
-                    <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Name</TableCell>
-                                    <TableCell>Age</TableCell>
-                                    <TableCell>Sex</TableCell>
-                                    <TableCell>Mobile Number</TableCell>
-                                    <TableCell>Gov Id Type</TableCell>
-                                    <TableCell>Gov Id</TableCell>
-                                    <TableCell>Address</TableCell>
-                                    <TableCell>City</TableCell>
-                                    <TableCell>Pin Code</TableCell>
-                                    <TableCell>State</TableCell>
-                                    <TableCell>Country</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {formList.map((data: personalDetails) => <TableRow>
-                                    <TableCell>{data.name}</TableCell>
-                                    <TableCell>{data.dob}</TableCell>
-                                    <TableCell>{data.sex}</TableCell>
-                                    <TableCell>{data.mobile}</TableCell>
-                                    <TableCell>{data.govIDType}</TableCell>
-                                    <TableCell>{data.govID}</TableCell>
-                                    <TableCell>{data.address}</TableCell>
-                                    <TableCell>{data.city}</TableCell>
-                                    <TableCell>{data.pinCode}</TableCell>
-                                    <TableCell>{data.state}</TableCell>
-                                    <TableCell>{data.country}</TableCell>
-                                </TableRow>)}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Box>
+                <Container maxWidth='md'>
+                    <Box sx={{ flex: 2, marginTop: 8, }}>
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Age</TableCell>
+                                        <TableCell>Sex</TableCell>
+                                        <TableCell>Mobile Number</TableCell>
+                                        <TableCell>Gov Id Type</TableCell>
+                                        <TableCell>Gov Id</TableCell>
+                                        <TableCell>Address</TableCell>
+                                        <TableCell>City</TableCell>
+                                        <TableCell>Pin Code</TableCell>
+                                        <TableCell>State</TableCell>
+                                        <TableCell>Country</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {formList.map((data: personalDetails) => <TableRow>
+                                        <TableCell>{data.name}</TableCell>
+                                        <TableCell>{data.dob}</TableCell>
+                                        <TableCell>{data.sex}</TableCell>
+                                        <TableCell>{data.mobile}</TableCell>
+                                        <TableCell>{data.govIDType}</TableCell>
+                                        <TableCell>{data.govID}</TableCell>
+                                        <TableCell>{data.address}</TableCell>
+                                        <TableCell>{data.city}</TableCell>
+                                        <TableCell>{data.pinCode}</TableCell>
+                                        <TableCell>{data.state}</TableCell>
+                                        <TableCell>{data.country}</TableCell>
+                                    </TableRow>)}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box>
+                </Container>
             </Container >
         </>
     )
