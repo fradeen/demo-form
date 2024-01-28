@@ -2,7 +2,7 @@ import { Autocomplete, Box, Button, Container, CssBaseline, FormHelperText, Grid
 import { SubmitHandler, useForm } from "react-hook-form"
 import { InferType, number, object, string } from "yup"
 import { yupResolver } from "@hookform/resolvers/yup"
-import { Done } from "@mui/icons-material"
+import { ArrowRight, Done } from "@mui/icons-material"
 import { useCallback, useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../hooks"
 import { addToList } from "./formsListSlice"
@@ -47,9 +47,10 @@ const personalDetailsSchema = object().shape({
 export type personalDetails = InferType<typeof personalDetailsSchema>
 
 export const RegistrationForm = () => {
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<personalDetails>({ resolver: yupResolver(personalDetailsSchema) })
+    const { register, handleSubmit, formState: { errors }, reset, trigger } = useForm<personalDetails>({ resolver: yupResolver(personalDetailsSchema) })
     const [countryList, setCountryList] = useState<string[]>([])
     const [countryInput, setCountryinput] = useState('')
+    const [isFirstStepCompleted, setFirstStepCompleted] = useState<boolean>()
     const dispatch = useAppDispatch()
     const formList = useAppSelector(state => state.formList)
     const onSubmit: SubmitHandler<personalDetails> = async (formInput) => {
@@ -90,94 +91,108 @@ export const RegistrationForm = () => {
         <>
             <CssBaseline />
             <Container component="main" maxWidth='md' sx={{ display: "flex", flexDirection: "column" }}>
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3, display: "flex", flexDirection: "row", justifyContent: "space-between", flex: 1 }} id="demo-form" >
+                <Container maxWidth='xs'>
+                    <Box
+                        sx={{
+                            marginTop: 8,
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            flex: 1
+                        }}
+                    >
+                        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3, display: "flex", flexDirection: "row", justifyContent: "space-between" }} id="demo-form" >
 
-                        <Grid container spacing={2} flex={1} margin={'10px'}>
-                            <Grid xs={12} item>
-                                <Typography component="h1" variant="h5" margin={'10px'}>
-                                    Enter personal Details
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField {...register('name')} label='Name' error={Boolean(errors.name)} helperText={errors.name ? errors.name.message : ""} />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField label="Age" error={Boolean(errors.dob)} helperText={errors.dob ? errors.dob.message : ""} {...register('dob')} type="number" />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField select defaultValue={undefined} label="Sex" {...register('sex')} error={Boolean(errors.sex)} helperText={errors.sex ? errors.sex.message?.toString() : ""} fullWidth >
-                                    <MenuItem value='male'>Male</MenuItem>
-                                    <MenuItem value='female'>Female</MenuItem>
-                                </TextField>
-                                <FormHelperText error={Boolean(errors.sex)}></FormHelperText>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField {...register('mobile')} label='Mobile' error={Boolean(errors.mobile)} helperText={errors.mobile ? errors.mobile.message : ""} type="number" />
-                            </Grid>
-                            <Grid item xs={12}  >
-                                <Grid container flexDirection={'row'} alignContent={'center'} justifyContent={'center'}>
-                                    <Grid item xs={2}><InputLabel style={{ textWrap: 'wrap' }}>Govt Issued ID</InputLabel></Grid>
-                                    <Grid item xs={4}>
-                                        <TextField select {...register('govIDType')} error={Boolean(errors.govIDType)} helperText={errors.govIDType ? errors.govIDType?.message?.toString() : ""} fullWidth label='ID Type' >
-                                            <MenuItem value="">
-                                                <em>None</em>
-                                            </MenuItem>
-                                            <MenuItem value='aadhar'>Aadhar</MenuItem>
-                                            <MenuItem value='pan'>PAN</MenuItem>
-                                        </TextField>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <TextField {...register('govID')} label='Govt ID' placeholder="Enter Govt ID" error={Boolean(errors.govID)} helperText={errors.govID ? errors.govID.message : ""} />
+                            <Grid container spacing={2} flex={1} margin={'10px'} display={isFirstStepCompleted ? "none" : "flex"}>
+                                <Grid xs={12} item>
+                                    <Typography component="h1" variant="h5" margin={'10px'}>
+                                        Enter personal Details
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField {...register('name')} label='Name' error={Boolean(errors.name)} helperText={errors.name ? errors.name.message : ""} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField label="Age" error={Boolean(errors.dob)} helperText={errors.dob ? errors.dob.message : ""} {...register('dob')} type="number" />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField select defaultValue={undefined} label="Sex" {...register('sex')} error={Boolean(errors.sex)} helperText={errors.sex ? errors.sex.message?.toString() : ""} fullWidth >
+                                        <MenuItem value='male'>Male</MenuItem>
+                                        <MenuItem value='female'>Female</MenuItem>
+                                    </TextField>
+                                    <FormHelperText error={Boolean(errors.sex)}></FormHelperText>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField {...register('mobile')} label='Mobile' error={Boolean(errors.mobile)} helperText={errors.mobile ? errors.mobile.message : ""} type="number" />
+                                </Grid>
+                                <Grid item xs={12}  >
+                                    <Grid container flexDirection={'row'} alignContent={'center'} justifyContent={'center'}>
+                                        <Grid item xs={2}><InputLabel style={{ textWrap: 'wrap' }}>Govt Issued ID</InputLabel></Grid>
+                                        <Grid item xs={4}>
+                                            <TextField select {...register('govIDType')} error={Boolean(errors.govIDType)} helperText={errors.govIDType ? errors.govIDType?.message?.toString() : ""} fullWidth label='ID Type' >
+                                                <MenuItem value="">
+                                                    <em>None</em>
+                                                </MenuItem>
+                                                <MenuItem value='aadhar'>Aadhar</MenuItem>
+                                                <MenuItem value='pan'>PAN</MenuItem>
+                                            </TextField>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <TextField {...register('govID')} label='Govt ID' placeholder="Enter Govt ID" error={Boolean(errors.govID)} helperText={errors.govID ? errors.govID.message : ""} />
+                                        </Grid>
+                                        <Grid item xs={12} sm={12}>
+                                            <Grid container flexDirection={"row-reverse"}>
+                                                <Grid item >
+                                                    <Button type="button" size="large" onClick={async () => {
+                                                        const validationPassed = await trigger(['name', 'dob', 'sex', 'mobile', 'govID', 'govIDType'])
+                                                        if (validationPassed)
+                                                            setFirstStepCompleted(true)
+                                                    }} >Next<ArrowRight /></Button>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
 
-                        <Grid container spacing={2} flex={1} margin={'10px'}>
-                            <Grid xs={12} item>
-                                <Typography component="h1" variant="h5" margin={'10px'}>
-                                    Enter residential Details
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField {...register('address')} label='Addresss' error={Boolean(errors.address)} helperText={errors.address ? errors.address.message : ""} multiline rows={5} />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField label="State" error={Boolean(errors.state)} helperText={errors.state ? errors.state.message : ""} {...register('state')} />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField label="City" {...register('city')} error={Boolean(errors.city)} helperText={errors.city ? errors.city.message?.toString() : ""} />
-                            </Grid>
-                            <Grid item xs={12} sm={6} >
-                                <Autocomplete
-                                    disablePortal
-                                    id="combo-box-demo"
-                                    options={countryList}
-                                    renderInput={(params) => <TextField {...params} {...register('country')} error={Boolean(errors.country)} helperText={errors.country ? errors.country?.message?.toString() : ""} label='Country' value={countryInput} onChange={event => setCountryinput(event.target.value)} />}
-                                />
+                            <Grid container spacing={2} flex={1} margin={'10px'} display={isFirstStepCompleted ? "flex" : "none"}>
+                                <Grid xs={12} item>
+                                    <Typography component="h1" variant="h5" margin={'10px'}>
+                                        Enter residential Details
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField {...register('address')} label='Addresss' error={Boolean(errors.address)} helperText={errors.address ? errors.address.message : ""} multiline rows={5} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField label="State" error={Boolean(errors.state)} helperText={errors.state ? errors.state.message : ""} {...register('state')} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField label="City" {...register('city')} error={Boolean(errors.city)} helperText={errors.city ? errors.city.message?.toString() : ""} />
+                                </Grid>
+                                <Grid item xs={12} sm={6} >
+                                    <Autocomplete
+                                        disablePortal
+                                        id="combo-box-demo"
+                                        options={countryList}
+                                        renderInput={(params) => <TextField {...params} {...register('country')} error={Boolean(errors.country)} helperText={errors.country ? errors.country?.message?.toString() : ""} label='Country' value={countryInput} onChange={event => setCountryinput(event.target.value)} />}
+                                    />
 
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField {...register('pinCode')} label='Pin Code' error={Boolean(errors.pinCode)} helperText={errors.pinCode ? errors.pinCode.message : ""} type="number" />
-                            </Grid>
-                            <Grid item xs={12} sm={12}>
-                                <Grid container flexDirection={"row-reverse"}>
-                                    <Grid item >
-                                        <Button type="submit" size="large" ><Done />Submit</Button>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField {...register('pinCode')} label='Pin Code' error={Boolean(errors.pinCode)} helperText={errors.pinCode ? errors.pinCode.message : ""} type="number" />
+                                </Grid>
+                                <Grid item xs={12} sm={12}>
+                                    <Grid container flexDirection={"row-reverse"}>
+                                        <Grid item >
+                                            <Button type="submit" size="large" ><Done />Submit</Button>
+                                        </Grid>
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
+                        </Box>
                     </Box>
-                </Box>
+                </Container>
                 <Box sx={{ flex: 1 }}>
                     <TableContainer>
                         <Table>
